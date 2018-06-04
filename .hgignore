@@ -1,0 +1,7 @@
+syntax: glob
+CardboardSDK/Library/
+*/.vs/
+WalkingSimulation/Library/
+*.csproj
+*.sln
+WiiBalanceBoard/Library/
