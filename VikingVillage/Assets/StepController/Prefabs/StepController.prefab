@@ -77,6 +77,8 @@ GameObject:
   - component: {fileID: 54227221006270258}
   - component: {fileID: 82884419860580238}
   - component: {fileID: 114022155620745856}
+  - component: {fileID: 114609696694505306}
+  - component: {fileID: 114853128711859848}
   m_Layer: 0
   m_Name: StepController
   m_TagString: Untagged
@@ -121,7 +123,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1741108781176244}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.69, z: 0}
+  m_LocalPosition: {x: 13.275116, y: 5.394, z: 5.1322327}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4541004144279080}
@@ -301,7 +303,7 @@ MonoBehaviour:
   m_StickToGroundForce: 10
   m_GravityMultiplier: 2
   m_MouseLook:
-    XSensitivity: 20
+    XSensitivity: 2
     YSensitivity: 2
     clampVerticalRotation: 1
     MinimumX: -90
@@ -448,6 +450,20 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114609696694505306
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1741108781176244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d9286e24389bc74fb48282ec5ee9a4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stepThreshold: 25
+  stepCooldown: 1
+  port: COM6
 --- !u!114 &114764007928609440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -469,6 +485,21 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &114853128711859848
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1741108781176244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3971e87d7dca0848b3203a3b358ca52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 1
+  phidgetComponent: {fileID: 114022155620745856}
+  arduinoComponent: {fileID: 114609696694505306}
+  phidgetCallibrationPanel: {fileID: 1425397185798502}
 --- !u!124 &124725418205400160
 Behaviour:
   m_ObjectHideFlags: 1
