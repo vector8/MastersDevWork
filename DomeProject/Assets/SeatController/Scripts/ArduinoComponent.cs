@@ -84,7 +84,7 @@ public class ArduinoComponent : MonoBehaviour
             }
             else
             {
-                Vector3 direction = Vector3.ProjectOnPlane(directionFacing.forward, Vector3.up);
+                Vector3 direction = Vector3.ProjectOnPlane(-1f * directionFacing.forward, Vector3.up);
                 CustomInput.SetAxis("Vertical", direction.z);
                 CustomInput.SetAxis("Horizontal", direction.x);
             }
