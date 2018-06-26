@@ -5,7 +5,7 @@ int leftFsrValue = 0;
 int rightFsrValue = 0;
 
 #define NUM_FRAMES 10
-const float THRESHOLD = 5;
+const float THRESHOLD = 10;
 
 struct Frame
 {
@@ -27,43 +27,9 @@ int freeRam () {
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
-//void insertValue(float value, LinkedList<Frame> &frames)
-//{
-//  bool inserted = false;
-//  Frame newFrame;
-//  newFrame.value = value;
-//  newFrame.life = NUM_FRAMES;
-//  for(int i = 0; i < frames.size(); i++)
-//  {
-//    Frame f = frames.get(i);
-//
-//    f.life--;
-//
-//    if(f.life <= 0)
-//    {
-//      frames.remove(i);
-//      i--;
-//      continue;
-//    }
-//
-//    if(f.value >= value)
-//    {
-//      frames.add(i, newFrame);
-//      inserted = true;
-//      break;
-//    }
-//  }
-//  if(!inserted)
-//  {
-//   frames.add(newFrame);
-//  }
-//}
-
 void setup() 
 {
   Serial.begin(9600);
-
-  
 }
 
 void loop() 
@@ -79,9 +45,6 @@ void loop()
   }
   else
   {  
-  //  insertValue(rightFsrValue, framesSortedRight);
-  //  insertValue(leftFsrValue, framesSortedLeft);
-  
     currentIndex ++;
     if(currentIndex >= NUM_FRAMES)
       currentIndex = 0;
@@ -109,31 +72,19 @@ void loop()
     float rightMid = (rightMin + (3.0f * rightMax)) / 4.0f;
     float leftMid = (leftMin + (3.0f * leftMax)) / 4.0f;
 
-    int rightLeg = 1, leftLeg = 1;
+    int rightLeg = 0, leftLeg = 0;
   
-    if(rightFsrValue <= rightMax - THRESHOLD)
+    if(rightFsrValue > rightMin + THRESHOLD)
     {
-      //Serial.println("Right leg up");
-      rightLeg = 0;
+      rightLeg = 1;
     }
     
-    if(leftFsrValue <= leftMax - THRESHOLD)
+    if(leftFsrValue > leftMin + THRESHOLD)
     {
-      //Serial.println("Left leg up");
-      leftLeg = 0;
+      leftLeg = 1;
     }
 
-    Serial.println(String(rightLeg) + String(leftLeg));
-  //  if(leftStep && (leftFsrValue - rightFsrValue) > 100)
-  //  {
-  //    leftStep = false;
-  //    Serial.println("Left step!");
-  //  }
-  //  else if(!leftStep && (rightFsrValue - leftFsrValue) > 100)
-  //  {
-  //    leftStep = true;
-  //    Serial.println("Right step!");
-  //  }
+    Serial.println(String(leftLeg) + String(rightLeg));
   
     //String leftString = String(leftFsrValue);
     //String rightString = String(rightFsrValue);
