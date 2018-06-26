@@ -56,13 +56,13 @@ public class ArduinoComponent : MonoBehaviour
             //}
             string arduinoOutput = sp.ReadLine();
             print(arduinoOutput);
-            if (arduinoOutput[0] == '0' && !lastStepRight && arduinoOutput[1] == '1')
+            if (arduinoOutput[1] == '0' && !lastStepRight && arduinoOutput[0] == '1')
             {
                 lastStepRight = !lastStepRight;
                 print("Step right!");
                 stepCooldownTimer = 0f;
             }
-            else if (arduinoOutput[1] == '0' && lastStepRight && arduinoOutput[0] == '1')
+            else if (arduinoOutput[0] == '0' && lastStepRight && arduinoOutput[1] == '1')
             {
                 lastStepRight = !lastStepRight;
                 print("Step left!");
@@ -76,7 +76,7 @@ public class ArduinoComponent : MonoBehaviour
         if (stepCooldownTimer < stepCooldown)
         {
             stepCooldownTimer += Time.deltaTime;
-            if (stepCooldownTimer > stepCooldown)
+            if (stepCooldownTimer >= stepCooldown)
             {
 
                 CustomInput.SetAxis("Vertical", 0);
