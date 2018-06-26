@@ -5,7 +5,6 @@ using System.IO.Ports;
 
 public class ArduinoComponent : MonoBehaviour
 {
-    public float stepThreshold = 50f;
     public float stepCooldown = 0.25f;
     public string port;
 
@@ -21,6 +20,7 @@ public class ArduinoComponent : MonoBehaviour
         sp = new SerialPort(port, 9600);
         sp.Open();
         sp.ReadTimeout = 10;
+        stepCooldownTimer = stepCooldown;
     }
 
     // Update is called once per frame
