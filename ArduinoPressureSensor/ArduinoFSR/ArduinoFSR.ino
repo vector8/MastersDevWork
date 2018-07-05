@@ -5,7 +5,7 @@ int leftFsrValue = 0;
 int rightFsrValue = 0;
 
 #define NUM_FRAMES 10
-const float THRESHOLD = 10;
+const float THRESHOLD = 20;
 
 struct Frame
 {
@@ -16,12 +16,17 @@ struct Frame
 float framesRight[NUM_FRAMES];
 float framesLeft[NUM_FRAMES];
 
-int currentIndex = 0;
+float leftAvg = 0;
+float rightAvg = 0;
+
+int currentIndexRight = 0;
+int currentIndexLeft = 0;
 
 bool leftStep = true;
 bool first = true;
 
-int freeRam () {
+int freeRam () 
+{
   extern int __heap_start, *__brkval; 
   int v; 
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
@@ -30,6 +35,8 @@ int freeRam () {
 void setup() 
 {
   Serial.begin(9600);
+  leftAvg = 0;
+  rightAvg = 0;
 }
 
 void loop() 
@@ -37,59 +44,71 @@ void loop()
   leftFsrValue = analogRead(leftFSRPin);
   rightFsrValue = analogRead(rightFSRPin);
 
+  int output = 3; // base2 = 11, both legs down
+
   if(first)
   {
-    memset(framesRight, rightFsrValue, NUM_FRAMES);
-    memset(framesLeft, leftFsrValue, NUM_FRAMES);
+    for(int i = 0; i < NUM_FRAMES; i++)
+    {
+      framesLeft[i] = leftFsrValue;
+      framesRight[i] = rightFsrValue;
+    }
+    leftAvg = 0;
+    rightAvg = 0;
+    Serial.println(String(leftFsrValue) + "," + String(rightFsrValue) + " : " + String(leftAvg) + "," + String(rightAvg));
     first = false;
   }
   else
   {  
-    currentIndex ++;
-    if(currentIndex >= NUM_FRAMES)
-      currentIndex = 0;
-    framesRight[currentIndex] = rightFsrValue;
-    framesLeft[currentIndex] = leftFsrValue;
-  
-    float rightMax = 0;
-    float rightMin = 1024;
-    float leftMax = 0;
-    float leftMin = 1024;
-  
-    for(int i = 0; i < NUM_FRAMES; i++)
+    if(rightFsrValue < rightAvg - THRESHOLD)
     {
-      if(framesRight[i] > rightMax)
-        rightMax = framesRight[i];
-      if(framesRight[i] < rightMin)
-        rightMin = framesRight[i];
-  
-      if(framesLeft[i] > leftMax)
-        leftMax = framesLeft[i];
-      if(framesLeft[i] < leftMin)
-        leftMin = framesLeft[i];
+      // leg up, dont count toward avg
+      output--;
     }
-  
-    float rightMid = (rightMin + (3.0f * rightMax)) / 4.0f;
-    float leftMid = (leftMin + (3.0f * leftMax)) / 4.0f;
-
-    int rightLeg = 0, leftLeg = 0;
-  
-    if(rightFsrValue > rightMin + THRESHOLD)
+    else
     {
-      rightLeg = 1;
+      // count toward avg
+      currentIndexRight ++;
+      if(currentIndexRight >= NUM_FRAMES)
+        currentIndexRight = 0;
+      framesRight[currentIndexRight] = rightFsrValue;
+
+      float sum = 0;
+      for(int i = 0; i < NUM_FRAMES; i++)
+      {
+        sum += framesRight[i];
+      }
+
+      rightAvg = sum / (float)NUM_FRAMES;
+    }
+
+    if(leftFsrValue < leftAvg - THRESHOLD)
+    {
+      // leg up, dont count toward avg
+      output -= 2;
+    }
+    else
+    {
+      // count toward avg
+      currentIndexLeft ++;
+      if(currentIndexLeft >= NUM_FRAMES)
+        currentIndexLeft = 0;
+      framesLeft[currentIndexLeft] = leftFsrValue;
+
+      float sum = 0;
+      for(int i = 0; i < NUM_FRAMES; i++)
+      {
+        sum += framesLeft[i];
+      }
+
+      leftAvg = sum / (float)NUM_FRAMES;
     }
     
-    if(leftFsrValue > leftMin + THRESHOLD)
-    {
-      leftLeg = 1;
-    }
-
-    Serial.println(String(leftLeg) + String(rightLeg));
-  
-    //String leftString = String(leftFsrValue);
-    //String rightString = String(rightFsrValue);
-    //Serial.println(leftString + "," + rightString + " : " + String(leftMid) + "," + String(rightMid));
-//    Serial.println(freeRam());
+    //Serial.println(output);
+    
+    Serial.println(String(leftFsrValue) + "," + String(rightFsrValue) + " : " + String(leftAvg) + "," + String(rightAvg));
+    //Serial.println(String(leftFsrValue) + "," + String(rightFsrValue) + " : " + String(leftMid) + "," + String(rightMid));
+    //Serial.println(freeRam());
   }
 
   delay(100);
