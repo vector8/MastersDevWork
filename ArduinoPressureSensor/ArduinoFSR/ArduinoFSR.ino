@@ -3,23 +3,12 @@ const int rightFSRPin = A0;
 
 int leftFsrValue = 0;  
 int rightFsrValue = 0;
+int lastLeftValue = 0;
+int lastRightValue = 0;
 
-#define NUM_FRAMES 10
-const float THRESHOLD = 10;
-
-struct Frame
-{
-  float value;
-  int life;
-};
-
-float framesRight[NUM_FRAMES];
-float framesLeft[NUM_FRAMES];
-
-int currentIndex = 0;
-
-bool leftStep = true;
 bool first = true;
+
+const float THRESHOLD = 10;
 
 int freeRam () {
   extern int __heap_start, *__brkval; 
@@ -39,57 +28,33 @@ void loop()
 
   if(first)
   {
-    memset(framesRight, rightFsrValue, NUM_FRAMES);
-    memset(framesLeft, leftFsrValue, NUM_FRAMES);
+    lastLeftValue = leftFsrValue;
+    lastRightValue = rightFsrValue;
     first = false;
   }
   else
   {  
-    currentIndex ++;
-    if(currentIndex >= NUM_FRAMES)
-      currentIndex = 0;
-    framesRight[currentIndex] = rightFsrValue;
-    framesLeft[currentIndex] = leftFsrValue;
+    int output = 0;
   
-    float rightMax = 0;
-    float rightMin = 1024;
-    float leftMax = 0;
-    float leftMin = 1024;
-  
-    for(int i = 0; i < NUM_FRAMES; i++)
+    if(rightFsrValue > lastRightValue + THRESHOLD || rightFsrValue < lastRightValue - THRESHOLD)
     {
-      if(framesRight[i] > rightMax)
-        rightMax = framesRight[i];
-      if(framesRight[i] < rightMin)
-        rightMin = framesRight[i];
-  
-      if(framesLeft[i] > leftMax)
-        leftMax = framesLeft[i];
-      if(framesLeft[i] < leftMin)
-        leftMin = framesLeft[i];
-    }
-  
-    float rightMid = (rightMin + (3.0f * rightMax)) / 4.0f;
-    float leftMid = (leftMin + (3.0f * leftMax)) / 4.0f;
-
-    int rightLeg = 0, leftLeg = 0;
-  
-    if(rightFsrValue > rightMin + THRESHOLD)
-    {
-      rightLeg = 1;
+      output += 2;
     }
     
-    if(leftFsrValue > leftMin + THRESHOLD)
+    if(leftFsrValue > lastLeftValue + THRESHOLD || leftFsrValue < lastLeftValue - THRESHOLD)
     {
-      leftLeg = 1;
+      output += 1;
     }
 
-    Serial.println(String(leftLeg) + String(rightLeg));
+    Serial.println(String(output));
   
     //String leftString = String(leftFsrValue);
     //String rightString = String(rightFsrValue);
     //Serial.println(leftString + "," + rightString + " : " + String(leftMid) + "," + String(rightMid));
 //    Serial.println(freeRam());
+
+    lastLeftValue = leftFsrValue;
+    lastRightValue = rightFsrValue;
   }
 
   delay(100);
