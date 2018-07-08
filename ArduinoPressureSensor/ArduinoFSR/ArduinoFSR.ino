@@ -7,8 +7,11 @@ int lastLeftValue = 0;
 int lastRightValue = 0;
 
 bool first = true;
+bool leftUp = true;
+bool rightUp = true;
+int output = 0;
 
-const float THRESHOLD = 10;
+const float THRESHOLD = 25;
 
 int freeRam () {
   extern int __heap_start, *__brkval; 
@@ -34,20 +37,34 @@ void loop()
   }
   else
   {  
-    int output = 0;
-  
-    if(rightFsrValue > lastRightValue + THRESHOLD || rightFsrValue < lastRightValue - THRESHOLD)
+    if(rightFsrValue < lastRightValue - THRESHOLD)
     {
-      output += 2;
+      rightUp = true;
+    }
+    else if( rightFsrValue > lastRightValue + THRESHOLD)
+    {
+      rightUp = false;
     }
     
-    if(leftFsrValue > lastLeftValue + THRESHOLD || leftFsrValue < lastLeftValue - THRESHOLD)
+    if(leftFsrValue < lastLeftValue - THRESHOLD)
     {
-      output += 1;
+      leftUp = true;
+    }
+    else if(leftFsrValue > lastLeftValue + THRESHOLD)
+    {
+      leftUp = false;
     }
 
-    Serial.println(String(output));
-  
+    if(leftUp && rightUp)
+    {
+      output = 0;
+    }
+    else
+    {
+      output = 1;
+    }
+
+     Serial.println(String(output));
     //String leftString = String(leftFsrValue);
     //String rightString = String(rightFsrValue);
     //Serial.println(leftString + "," + rightString + " : " + String(leftMid) + "," + String(rightMid));
