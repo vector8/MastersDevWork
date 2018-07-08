@@ -9,8 +9,9 @@ public class ArduinoComponent : MonoBehaviour
     public string port;
 
     public Transform directionFacing;
+    public float angle;
 
-    private bool lastStepRight = false;
+    private bool canMove = false;
     private float stepCooldownTimer = 0f;
     private SerialPort sp;
 
@@ -28,95 +29,53 @@ public class ArduinoComponent : MonoBehaviour
     {
         try
         {
-            //char[] seps = { ',' };
-            //string[] arduinoOutput = (sp.ReadLine()).Split(seps, System.StringSplitOptions.None);
-            //if(arduinoOutput.Length == 2)
-            //{
-            //    int fsrValue1 = int.Parse(arduinoOutput[0]);
-            //    int fsrValue2 = int.Parse(arduinoOutput[1]);
-
-            //    print("" + fsrValue1 + ", " + fsrValue2);
-
-            //    float delta = fsrValue1 - fsrValue2;
-
-            //    if (lastStepRight && delta < -stepThreshold)
-            //    {
-            //        lastStepRight = !lastStepRight;
-            //        print("Step left!");
-            //        CustomInput.SetAxis("Vertical", 1f);
-            //        stepCooldownTimer = 0f;
-            //    }
-            //    else if (!lastStepRight && delta > stepThreshold)
-            //    {
-            //        lastStepRight = !lastStepRight;
-            //        print("Step right!");
-            //        CustomInput.SetAxis("Vertical", 1f);
-            //        stepCooldownTimer = 0f;
-            //    }
-            //}
             string arduinoOutput = sp.ReadLine();
             print(arduinoOutput);
-            if ((arduinoOutput[0] == '1' || arduinoOutput[0] == '3') && !lastStepRight)
+            if (arduinoOutput[0] == '1')
             {
-                lastStepRight = !lastStepRight;
-                print("Step right!");
-                stepCooldownTimer = 0f;
+                canMove = true;
             }
-            else if ((arduinoOutput[0] == '2' || arduinoOutput[0] == '3') && lastStepRight)
+            else 
             {
-                lastStepRight = !lastStepRight;
-                print("Step left!");
-                stepCooldownTimer = 0f;
+                canMove = false;
             }
         }
         catch(System.Exception)
         {
         }
 
-        if (stepCooldownTimer < stepCooldown)
+        if (canMove)
         {
-            stepCooldownTimer += Time.deltaTime;
-            if (stepCooldownTimer >= stepCooldown)
-            {
+            // check angle of vive tracker
+            angle = directionFacing.localRotation.eulerAngles.x;
 
-                CustomInput.SetAxis("Vertical", 0);
-                CustomInput.SetAxis("Horizontal", 0);
-            }
-            else
+            if (angle < 23f)
             {
+                // move forward
                 Vector3 direction = Vector3.ProjectOnPlane(-1f * directionFacing.forward, Vector3.up);
                 CustomInput.SetAxis("Vertical", direction.z);
                 CustomInput.SetAxis("Horizontal", direction.x);
+
+            }
+            else if(angle > 33f)
+            {
+                // move backward
+                Vector3 direction = Vector3.ProjectOnPlane(directionFacing.forward, Vector3.up);
+                CustomInput.SetAxis("Vertical", direction.z);
+                CustomInput.SetAxis("Horizontal", direction.x);
+            }
+            else
+            {
+                // stop moving
+                CustomInput.SetAxis("Vertical", 0);
+                CustomInput.SetAxis("Horizontal", 0);
             }
         }
-
-        //print("" + bridge1Value + ", " + bridge2Value);
-        //print(Input.GetAxis("Horizontal"));
-
-        //float delta = bridge1Value - bridge2Value;
-
-        //if (lastStepRight && delta < -stepThreshold)
-        //{
-        //    lastStepRight = !lastStepRight;
-        //    print("Step left!");
-        //    CustomInput.SetAxis("Vertical", 1f);
-        //    stepCooldownTimer = 0f;
-        //}
-        //else if (!lastStepRight && delta > stepThreshold)
-        //{
-        //    lastStepRight = !lastStepRight;
-        //    print("Step right!");
-        //    CustomInput.SetAxis("Vertical", 1f);
-        //    stepCooldownTimer = 0f;
-        //}
-        //else if (stepCooldownTimer < stepCooldown)
-        //{
-        //    stepCooldownTimer += Time.deltaTime;
-        //    if (stepCooldownTimer > stepCooldown)
-        //    {
-        //        CustomInput.SetAxis("Vertical", 0f);
-        //    }
-        //}
+        else
+        {
+            CustomInput.SetAxis("Vertical", 0);
+            CustomInput.SetAxis("Horizontal", 0);
+        }
     }
 
     private void OnApplicationQuit()
